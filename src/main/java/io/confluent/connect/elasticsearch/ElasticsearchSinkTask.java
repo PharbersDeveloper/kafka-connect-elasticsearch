@@ -15,6 +15,8 @@
 
 package io.confluent.connect.elasticsearch;
 
+import com.pharbers.kafka.producer.PharbersKafkaProducer;
+import com.pharbers.kafka.schema.SinkRecall;
 import io.confluent.connect.elasticsearch.bulk.BulkProcessor;
 import io.confluent.connect.elasticsearch.jest.JestElasticsearchClient;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -41,6 +43,12 @@ public class ElasticsearchSinkTask extends SinkTask {
   private ElasticsearchClient client;
   private Boolean createIndicesAtStartTime;
 
+  //TODO：配置化<K, V>泛型参数
+  private PharbersKafkaProducer<String, SinkRecall> phaKafkaProducer =
+          new PharbersKafkaProducer<>();
+  private String recallTopic;
+  private String jobID;
+
   @Override
   public String version() {
     return Version.getVersion();
@@ -65,6 +73,8 @@ public class ElasticsearchSinkTask extends SinkTask {
           config.getBoolean(ElasticsearchSinkConnectorConfig.SCHEMA_IGNORE_CONFIG);
       boolean useCompactMapEntries =
           config.getBoolean(ElasticsearchSinkConnectorConfig.COMPACT_MAP_ENTRIES_CONFIG);
+      jobID = config.getString(ElasticsearchSinkConnectorConfig.JOB_ID_CONFIG);
+      recallTopic = "recall_" + jobID;
 
 
       Map<String, String> topicToIndexMap =
@@ -166,7 +176,9 @@ public class ElasticsearchSinkTask extends SinkTask {
   @Override
   public void put(Collection<SinkRecord> records) throws ConnectException {
     log.trace("Putting {} to Elasticsearch.", records);
+    log.info("Pharbers *** put records.size = " + records.size());
     writer.write(records);
+    phaKafkaProducer.produce(recallTopic, jobID, new SinkRecall(jobID, (long)records.size()));
   }
 
   @Override

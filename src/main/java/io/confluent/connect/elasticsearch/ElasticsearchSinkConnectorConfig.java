@@ -31,6 +31,8 @@ import static org.apache.kafka.common.config.SslConfigs.addClientSslSupport;
 public class ElasticsearchSinkConnectorConfig extends AbstractConfig {
   private static final String SSL_GROUP = "Security";
 
+  public static final String JOB_ID_CONFIG = "jobId";
+
   public static final String CONNECTION_URL_CONFIG = "connection.url";
   private static final String CONNECTION_URL_DOC =
       "The comma-separated list of one or more Elasticsearch URLs, such as ``http://eshost1:9200,"
@@ -186,6 +188,11 @@ public class ElasticsearchSinkConnectorConfig extends AbstractConfig {
         ++order,
         Width.LONG,
         "Connection URLs"
+    ).define(
+            JOB_ID_CONFIG,
+            Type.STRING,
+            Importance.HIGH,
+            "Single job id."
     ).define(
         CONNECTION_USERNAME_CONFIG,
         Type.STRING,

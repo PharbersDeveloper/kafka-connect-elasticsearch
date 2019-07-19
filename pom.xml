@@ -39,7 +39,7 @@
     </scm>
 
     <properties>
-        <es.version>2.4.1</es.version>
+        <es.version>7.2.0</es.version>
         <lucene.version>5.5.2</lucene.version>
         <jest.version>2.4.0</jest.version>
         <kafka.connect.maven.plugin.version>0.11.1</kafka.connect.maven.plugin.version>
@@ -56,6 +56,12 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.pharbers</groupId>
+            <artifactId>pharbers-kafka</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-api</artifactId>
@@ -105,14 +111,6 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${es.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>${es.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -215,16 +213,10 @@
                             </componentTypes>
 
                             <tags>
-                                <tag>Elastic</tag>
-                                <tag>elasticsearch</tag>
                                 <tag>search</tag>
                                 <tag>analytics</tag>
                                 <tag>log</tag>
                             </tags>
-
-                            <requirements>
-                                <requirement>Elasticsearch 2.x, 5.x, or 6.x</requirement>
-                            </requirements>
 
                             <deliveryGuarantee>
                                 <deliveryGuarantee>exactlyOnce</deliveryGuarantee>

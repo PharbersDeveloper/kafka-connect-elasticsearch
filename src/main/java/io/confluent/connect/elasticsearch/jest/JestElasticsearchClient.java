@@ -16,7 +16,6 @@
 package io.confluent.connect.elasticsearch.jest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
 import io.confluent.connect.elasticsearch.ElasticsearchClient;
@@ -288,13 +287,15 @@ public class JestElasticsearchClient implements ElasticsearchClient {
   }
 
   public void createMapping(String index, String type, Schema schema) throws IOException {
-    ObjectNode obj = JsonNodeFactory.instance.objectNode();
-    obj.set(type, Mapping.inferMapping(this, schema));
-    PutMapping putMapping = new PutMapping.Builder(index, type, obj.toString()).build();
+    log.info("Pharbers *** Schema" + Mapping.inferMapping(this, schema).toString());
+    PutMapping putMapping = new PutMapping.Builder(index, type,
+            Mapping.inferMapping(this, schema).toString()).build();
+    log.info("Pharbers *** putMapping" + putMapping.toString());
     JestResult result = client.execute(putMapping);
     if (!result.isSucceeded()) {
       throw new ConnectException(
-          "Cannot create mapping " + obj + " -- " + result.getErrorMessage()
+          "Cannot create mapping " + Mapping.inferMapping(this, schema)
+                  + " -- " + result.getErrorMessage()
       );
     }
   }
