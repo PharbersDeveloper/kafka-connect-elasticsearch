@@ -176,15 +176,20 @@ public class ElasticsearchSinkTask extends SinkTask {
   @Override
   public void put(Collection<SinkRecord> records) throws ConnectException {
     log.trace("Putting {} to Elasticsearch.", records);
-    log.info("Pharbers *** put records.size = " + records.size());
+//    log.info("Pharbers *** put records.size = " + records.size());
     writer.write(records);
-    phaKafkaProducer.produce(recallTopic, jobID, new SinkRecall(jobID, (long)records.size()));
   }
 
   @Override
   public void flush(Map<TopicPartition, OffsetAndMetadata> offsets) {
     log.trace("Flushing data to Elasticsearch with the following offsets: {}", offsets);
+    long offset = 0;
+    for(OffsetAndMetadata offsetAndMetadata : offsets.values()){
+      offset += offsetAndMetadata.offset();
+    }
+    log.info("offset********************" + offset);
     writer.flush();
+    phaKafkaProducer.produce(recallTopic, jobID, new SinkRecall(jobID, offset));
   }
 
   @Override
