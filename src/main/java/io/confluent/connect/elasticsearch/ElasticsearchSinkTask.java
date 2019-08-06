@@ -44,8 +44,7 @@ public class ElasticsearchSinkTask extends SinkTask {
   private Boolean createIndicesAtStartTime;
 
   //TODO：配置化<K, V>泛型参数
-  private PharbersKafkaProducer<String, SinkRecall> phaKafkaProducer =
-          new PharbersKafkaProducer<>();
+  private PharbersKafkaProducer<String, SinkRecall> phaKafkaProducer;
   private String recallTopic;
   private String jobID;
 
@@ -65,6 +64,7 @@ public class ElasticsearchSinkTask extends SinkTask {
     try {
       log.info("Starting ElasticsearchSinkTask.");
 
+      phaKafkaProducer = new PharbersKafkaProducer<>();
       ElasticsearchSinkConnectorConfig config = new ElasticsearchSinkConnectorConfig(props);
       String type = config.getString(ElasticsearchSinkConnectorConfig.TYPE_NAME_CONFIG);
       boolean ignoreKey =
@@ -199,6 +199,7 @@ public class ElasticsearchSinkTask extends SinkTask {
 
   @Override
   public void stop() throws ConnectException {
+    phaKafkaProducer.producer().close();
     log.info("Stopping ElasticsearchSinkTask.");
     if (writer != null) {
       writer.stop();
