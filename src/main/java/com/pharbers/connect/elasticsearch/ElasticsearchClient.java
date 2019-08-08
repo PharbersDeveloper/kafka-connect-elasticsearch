@@ -13,11 +13,11 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch;
+package com.pharbers.connect.elasticsearch;
 
 import com.google.gson.JsonObject;
-import io.confluent.connect.elasticsearch.bulk.BulkRequest;
-import io.confluent.connect.elasticsearch.bulk.BulkResponse;
+import com.pharbers.connect.elasticsearch.bulk.BulkRequest;
+import com.pharbers.connect.elasticsearch.bulk.BulkResponse;
 import org.apache.kafka.connect.data.Schema;
 
 import java.io.IOException;

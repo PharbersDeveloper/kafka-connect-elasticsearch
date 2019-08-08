@@ -13,20 +13,15 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch.jest;
+package com.pharbers.connect.elasticsearch.bulk;
 
-import io.confluent.connect.elasticsearch.bulk.BulkRequest;
-import io.searchbox.core.Bulk;
+import java.io.IOException;
+import java.util.List;
 
-public class JestBulkRequest implements BulkRequest {
+public interface BulkClient<R, B> {
 
-  private final Bulk bulk;
+  B bulkRequest(List<R> batch);
 
-  public JestBulkRequest(Bulk bulk) {
-    this.bulk = bulk;
-  }
+  BulkResponse execute(B req) throws IOException;
 
-  public Bulk getBulk() {
-    return bulk;
-  }
 }

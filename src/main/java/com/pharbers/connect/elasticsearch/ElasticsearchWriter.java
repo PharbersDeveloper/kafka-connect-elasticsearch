@@ -13,9 +13,9 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch;
+package com.pharbers.connect.elasticsearch;
 
-import io.confluent.connect.elasticsearch.bulk.BulkProcessor;
+import com.pharbers.connect.elasticsearch.bulk.BulkProcessor;
 import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.sink.SinkRecord;
@@ -31,9 +31,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static io.confluent.connect.elasticsearch.DataConverter.BehaviorOnNullValues;
-import static io.confluent.connect.elasticsearch.bulk.BulkProcessor.BehaviorOnMalformedDoc;
-
 public class ElasticsearchWriter {
   private static final Logger log = LoggerFactory.getLogger(ElasticsearchWriter.class);
 
@@ -48,11 +45,11 @@ public class ElasticsearchWriter {
   private final long flushTimeoutMs;
   private final BulkProcessor<IndexableRecord, ?> bulkProcessor;
   private final boolean dropInvalidMessage;
-  private final BehaviorOnNullValues behaviorOnNullValues;
+  private final DataConverter.BehaviorOnNullValues behaviorOnNullValues;
   private final DataConverter converter;
 
   private final Set<String> existingMappings;
-  private final BehaviorOnMalformedDoc behaviorOnMalformedDoc;
+  private final BulkProcessor.BehaviorOnMalformedDoc behaviorOnMalformedDoc;
 
   ElasticsearchWriter(
       ElasticsearchClient client,
@@ -71,8 +68,8 @@ public class ElasticsearchWriter {
       int maxRetries,
       long retryBackoffMs,
       boolean dropInvalidMessage,
-      BehaviorOnNullValues behaviorOnNullValues,
-      BehaviorOnMalformedDoc behaviorOnMalformedDoc
+      DataConverter.BehaviorOnNullValues behaviorOnNullValues,
+      BulkProcessor.BehaviorOnMalformedDoc behaviorOnMalformedDoc
   ) {
     this.client = client;
     this.type = type;
@@ -119,8 +116,8 @@ public class ElasticsearchWriter {
     private int maxRetry;
     private long retryBackoffMs;
     private boolean dropInvalidMessage;
-    private BehaviorOnNullValues behaviorOnNullValues = BehaviorOnNullValues.DEFAULT;
-    private BehaviorOnMalformedDoc behaviorOnMalformedDoc;
+    private DataConverter.BehaviorOnNullValues behaviorOnNullValues = DataConverter.BehaviorOnNullValues.DEFAULT;
+    private BulkProcessor.BehaviorOnMalformedDoc behaviorOnMalformedDoc;
 
     public Builder(ElasticsearchClient client) {
       this.client = client;
@@ -196,16 +193,16 @@ public class ElasticsearchWriter {
     /**
      * Change the behavior that the resulting {@link ElasticsearchWriter} will have when it
      * encounters records with null values.
-     * @param behaviorOnNullValues Cannot be null. If in doubt, {@link BehaviorOnNullValues#DEFAULT}
+     * @param behaviorOnNullValues Cannot be null. If in doubt, {@link DataConverter.BehaviorOnNullValues#DEFAULT}
      *                             can be used.
      */
-    public Builder setBehaviorOnNullValues(BehaviorOnNullValues behaviorOnNullValues) {
+    public Builder setBehaviorOnNullValues(DataConverter.BehaviorOnNullValues behaviorOnNullValues) {
       this.behaviorOnNullValues =
           Objects.requireNonNull(behaviorOnNullValues, "behaviorOnNullValues cannot be null");
       return this;
     }
 
-    public Builder setBehaviorOnMalformedDoc(BehaviorOnMalformedDoc behaviorOnMalformedDoc) {
+    public Builder setBehaviorOnMalformedDoc(BulkProcessor.BehaviorOnMalformedDoc behaviorOnMalformedDoc) {
       this.behaviorOnMalformedDoc = behaviorOnMalformedDoc;
       return this;
     }
@@ -272,7 +269,7 @@ public class ElasticsearchWriter {
   }
 
   private boolean ignoreRecord(SinkRecord record) {
-    return record.value() == null && behaviorOnNullValues == BehaviorOnNullValues.IGNORE;
+    return record.value() == null && behaviorOnNullValues == DataConverter.BehaviorOnNullValues.IGNORE;
   }
 
   private void tryWriteRecord(

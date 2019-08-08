@@ -13,12 +13,12 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch;
+package com.pharbers.connect.elasticsearch;
 
 import com.pharbers.kafka.producer.PharbersKafkaProducer;
 import com.pharbers.kafka.schema.SinkRecall;
-import io.confluent.connect.elasticsearch.bulk.BulkProcessor;
-import io.confluent.connect.elasticsearch.jest.JestElasticsearchClient;
+import com.pharbers.connect.elasticsearch.bulk.BulkProcessor;
+import com.pharbers.connect.elasticsearch.jest.JestElasticsearchClient;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigException;
@@ -45,8 +45,9 @@ public class ElasticsearchSinkTask extends SinkTask {
 
   //TODO：配置化<K, V>泛型参数
   private PharbersKafkaProducer<String, SinkRecall> phaKafkaProducer;
-  private String recallTopic;
   private String jobID;
+  private String recallSkip;
+  private String recallTopic;
 
   @Override
   public String version() {
@@ -63,7 +64,6 @@ public class ElasticsearchSinkTask extends SinkTask {
   public void start(Map<String, String> props, ElasticsearchClient client) {
     try {
       log.info("Starting ElasticsearchSinkTask.");
-
       phaKafkaProducer = new PharbersKafkaProducer<>();
       ElasticsearchSinkConnectorConfig config = new ElasticsearchSinkConnectorConfig(props);
       String type = config.getString(ElasticsearchSinkConnectorConfig.TYPE_NAME_CONFIG);
@@ -74,6 +74,7 @@ public class ElasticsearchSinkTask extends SinkTask {
       boolean useCompactMapEntries =
           config.getBoolean(ElasticsearchSinkConnectorConfig.COMPACT_MAP_ENTRIES_CONFIG);
       jobID = config.getString(ElasticsearchSinkConnectorConfig.JOB_ID_CONFIG);
+      recallSkip = config.getString(ElasticsearchSinkConnectorConfig.RECALL_SKIP_CONFIG);
       recallTopic = "recall_" + jobID;
 
 
@@ -176,7 +177,6 @@ public class ElasticsearchSinkTask extends SinkTask {
   @Override
   public void put(Collection<SinkRecord> records) throws ConnectException {
     log.trace("Putting {} to Elasticsearch.", records);
-//    log.info("Pharbers *** put records.size = " + records.size());
     writer.write(records);
   }
 
@@ -189,7 +189,9 @@ public class ElasticsearchSinkTask extends SinkTask {
     }
     log.info("offset********************" + offset);
     writer.flush();
-    phaKafkaProducer.produce(recallTopic, jobID, new SinkRecall(jobID, offset));
+    if (recallSkip == "no") {
+      phaKafkaProducer.produce(recallTopic, jobID, new SinkRecall(jobID, offset));
+    }
   }
 
   @Override

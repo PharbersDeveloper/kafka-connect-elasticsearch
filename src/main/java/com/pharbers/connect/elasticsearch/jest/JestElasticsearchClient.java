@@ -13,19 +13,20 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch.jest;
+package com.pharbers.connect.elasticsearch.jest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
-import io.confluent.connect.elasticsearch.ElasticsearchClient;
-import io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConfig;
-import io.confluent.connect.elasticsearch.IndexableRecord;
-import io.confluent.connect.elasticsearch.Key;
-import io.confluent.connect.elasticsearch.Mapping;
-import io.confluent.connect.elasticsearch.bulk.BulkRequest;
-import io.confluent.connect.elasticsearch.bulk.BulkResponse;
+import com.pharbers.connect.elasticsearch.ElasticsearchClient;
+import com.pharbers.connect.elasticsearch.ElasticsearchSinkConnectorConfig;
+import com.pharbers.connect.elasticsearch.Key;
+import com.pharbers.connect.elasticsearch.IndexableRecord;
+import com.pharbers.connect.elasticsearch.Mapping;
+import com.pharbers.connect.elasticsearch.bulk.BulkRequest;
+import com.pharbers.connect.elasticsearch.bulk.BulkResponse;
 import io.searchbox.action.Action;
 import io.searchbox.action.BulkableAction;
 import io.searchbox.client.JestClient;
@@ -41,6 +42,8 @@ import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.IndicesExists;
+import io.searchbox.indices.aliases.AddAliasMapping;
+import io.searchbox.indices.aliases.ModifyAliases;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
 import org.apache.http.HttpHost;
@@ -268,18 +271,31 @@ public class JestElasticsearchClient implements ElasticsearchClient {
 
   public void createIndices(Set<String> indices) {
     for (String index : indices) {
-      if (!indexExists(index)) {
-        CreateIndex createIndex = new CreateIndex.Builder(index).build();
+      //TODO：phIndexPostfix is required?
+      //TODO：alias is required?
+      String phIndexPostfix = "-000001";
+      String phIndex = index + phIndexPostfix;
+      String alias = index;
+      if (!indexExists(phIndex) || !indexExists(index)) {
         try {
+          CreateIndex createIndex = new CreateIndex.Builder(phIndex).build();
           JestResult result = client.execute(createIndex);
           if (!result.isSucceeded()) {
-            // Check if index was created by another client
-            if (!indexExists(index)) {
+            // Check if phIndex was created by another client
+            if (!indexExists(phIndex)) {
               String msg = result.getErrorMessage() != null ? ": " + result.getErrorMessage() : "";
-              throw new ConnectException("Could not create index '" + index + "'" + msg);
+              throw new ConnectException("Could not create phIndex '" + phIndex + "'" + msg);
             }
           }
-          indexCache.add(index);
+          indexCache.add(phIndex);
+          ModifyAliases modifyAliases = new ModifyAliases.Builder(
+                  new AddAliasMapping.Builder(phIndex, alias).build()
+          ).build();
+          JestResult aliasResult = client.execute(modifyAliases);
+          if (!aliasResult.isSucceeded()) {
+            String msg = aliasResult.getErrorMessage() != null ? ": " + aliasResult.getErrorMessage() : "";
+            throw new ConnectException("Could not create alias '" + alias + "'" + msg);
+          }
         } catch (IOException e) {
           throw new ConnectException(e);
         }
@@ -289,9 +305,7 @@ public class JestElasticsearchClient implements ElasticsearchClient {
 
   public void createMapping(String index, String type, Schema schema) throws IOException {
     JsonNode mapping = Mapping.inferMapping(this, schema);
-    log.info("Pharbers *** Schema" + mapping.toString());
     PutMapping putMapping = new PutMapping.Builder(index, type, mapping.toString()).build();
-    log.info("Pharbers *** putMapping" + putMapping.toString());
     JestResult result = client.execute(putMapping);
     if (!result.isSucceeded()) {
       throw new ConnectException(

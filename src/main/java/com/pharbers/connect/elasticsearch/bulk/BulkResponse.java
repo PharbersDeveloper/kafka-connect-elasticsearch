@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch.bulk;
+package com.pharbers.connect.elasticsearch.bulk;
 
 public class BulkResponse {
 

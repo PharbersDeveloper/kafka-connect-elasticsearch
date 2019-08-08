@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch;
+package com.pharbers.connect.elasticsearch;
 
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.data.ConnectSchema;
@@ -41,9 +41,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.MAP_KEY;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.MAP_VALUE;
 
 public class DataConverter {
 
@@ -238,8 +235,8 @@ public class DataConverter {
       return copySchemaBasics(schema, result).build();
     }
     Schema elementSchema = SchemaBuilder.struct().name(keyName + "-" + valueName)
-        .field(MAP_KEY, preprocessedKeySchema)
-        .field(MAP_VALUE, preprocessedValueSchema)
+        .field(ElasticsearchSinkConnectorConstants.MAP_KEY, preprocessedKeySchema)
+        .field(ElasticsearchSinkConnectorConstants.MAP_VALUE, preprocessedValueSchema)
         .build();
     return copySchemaBasics(schema, SchemaBuilder.array(elementSchema)).build();
   }
@@ -348,10 +345,10 @@ public class DataConverter {
     List<Struct> mapStructs = new ArrayList<>();
     for (Map.Entry<?, ?> entry: map.entrySet()) {
       Struct mapStruct = new Struct(newValueSchema);
-      Schema mapKeySchema = newValueSchema.field(MAP_KEY).schema();
-      Schema mapValueSchema = newValueSchema.field(MAP_VALUE).schema();
-      mapStruct.put(MAP_KEY, preProcessValue(entry.getKey(), keySchema, mapKeySchema));
-      mapStruct.put(MAP_VALUE, preProcessValue(entry.getValue(), valueSchema, mapValueSchema));
+      Schema mapKeySchema = newValueSchema.field(ElasticsearchSinkConnectorConstants.MAP_KEY).schema();
+      Schema mapValueSchema = newValueSchema.field(ElasticsearchSinkConnectorConstants.MAP_VALUE).schema();
+      mapStruct.put(ElasticsearchSinkConnectorConstants.MAP_KEY, preProcessValue(entry.getKey(), keySchema, mapKeySchema));
+      mapStruct.put(ElasticsearchSinkConnectorConstants.MAP_VALUE, preProcessValue(entry.getValue(), valueSchema, mapValueSchema));
       mapStructs.add(mapStruct);
     }
     return mapStructs;

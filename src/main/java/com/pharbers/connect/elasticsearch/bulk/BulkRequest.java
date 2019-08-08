@@ -13,15 +13,17 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch.bulk;
+package com.pharbers.connect.elasticsearch.bulk;
 
+
+import com.pharbers.connect.elasticsearch.ElasticsearchClient;
 
 import java.util.List;
 
 /**
  * BulkRequest is a marker interface for use with
- * {@link io.confluent.connect.elasticsearch.ElasticsearchClient#createBulkRequest(List)} and
- * {@link io.confluent.connect.elasticsearch.ElasticsearchClient#executeBulk(BulkRequest)}.
+ * {@link ElasticsearchClient#createBulkRequest(List)} and
+ * {@link ElasticsearchClient#executeBulk(BulkRequest)}.
  * Implementations will typically hold state comprised of instances of classes that are
  * specific to the client library.
  */

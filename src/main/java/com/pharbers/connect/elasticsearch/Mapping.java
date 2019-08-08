@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch;
+package com.pharbers.connect.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -30,20 +30,6 @@ import org.apache.kafka.connect.errors.DataException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.BINARY_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.BOOLEAN_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.BYTE_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.DOUBLE_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.FLOAT_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.INTEGER_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.KEYWORD_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.LONG_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.MAP_KEY;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.MAP_VALUE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.SHORT_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.STRING_TYPE;
-import static io.confluent.connect.elasticsearch.ElasticsearchSinkConnectorConstants.TEXT_TYPE;
 
 public class Mapping {
 
@@ -98,8 +84,8 @@ public class Mapping {
         return inferMapping(client, schema.valueSchema());
       case MAP:
         properties.set("properties", fields);
-        fields.set(MAP_KEY, inferMapping(client, schema.keySchema()));
-        fields.set(MAP_VALUE, inferMapping(client, schema.valueSchema()));
+        fields.set(ElasticsearchSinkConnectorConstants.MAP_KEY, inferMapping(client, schema.keySchema()));
+        fields.set(ElasticsearchSinkConnectorConstants.MAP_VALUE, inferMapping(client, schema.valueSchema()));
         return properties;
       case STRUCT:
         properties.set("properties", fields);
@@ -117,31 +103,31 @@ public class Mapping {
   protected static String getElasticsearchType(ElasticsearchClient client, Schema.Type schemaType) {
     switch (schemaType) {
       case BOOLEAN:
-        return BOOLEAN_TYPE;
+        return ElasticsearchSinkConnectorConstants.BOOLEAN_TYPE;
       case INT8:
-        return BYTE_TYPE;
+        return ElasticsearchSinkConnectorConstants.BYTE_TYPE;
       case INT16:
-        return SHORT_TYPE;
+        return ElasticsearchSinkConnectorConstants.SHORT_TYPE;
       case INT32:
-        return INTEGER_TYPE;
+        return ElasticsearchSinkConnectorConstants.INTEGER_TYPE;
       case INT64:
-        return LONG_TYPE;
+        return ElasticsearchSinkConnectorConstants.LONG_TYPE;
       case FLOAT32:
-        return FLOAT_TYPE;
+        return ElasticsearchSinkConnectorConstants.FLOAT_TYPE;
       case FLOAT64:
-        return DOUBLE_TYPE;
+        return ElasticsearchSinkConnectorConstants.DOUBLE_TYPE;
       case STRING:
         switch (client.getVersion()) {
           case ES_V1:
           case ES_V2:
-            return STRING_TYPE;
+            return ElasticsearchSinkConnectorConstants.STRING_TYPE;
           case ES_V5:
           case ES_V6:
           default:
-            return TEXT_TYPE;
+            return ElasticsearchSinkConnectorConstants.TEXT_TYPE;
         }
       case BYTES:
-        return BINARY_TYPE;
+        return ElasticsearchSinkConnectorConstants.BINARY_TYPE;
       default:
         return null;
     }
@@ -174,7 +160,7 @@ public class Mapping {
 
     ObjectNode obj = JsonNodeFactory.instance.objectNode();
     obj.set("type", JsonNodeFactory.instance.textNode(type));
-    if (type.equals(TEXT_TYPE)) {
+    if (type.equals(ElasticsearchSinkConnectorConstants.TEXT_TYPE)) {
       addTextMapping(obj);
     }
     JsonNode defaultValueNode = null;
@@ -224,7 +210,7 @@ public class Mapping {
   private static void addTextMapping(ObjectNode obj) {
     // Add additional mapping for indexing, per https://www.elastic.co/blog/strings-are-dead-long-live-strings
     ObjectNode keyword = JsonNodeFactory.instance.objectNode();
-    keyword.set("type", JsonNodeFactory.instance.textNode(KEYWORD_TYPE));
+    keyword.set("type", JsonNodeFactory.instance.textNode(ElasticsearchSinkConnectorConstants.KEYWORD_TYPE));
     keyword.set("ignore_above", JsonNodeFactory.instance.numberNode(256));
     ObjectNode fields = JsonNodeFactory.instance.objectNode();
     fields.set("keyword", keyword);

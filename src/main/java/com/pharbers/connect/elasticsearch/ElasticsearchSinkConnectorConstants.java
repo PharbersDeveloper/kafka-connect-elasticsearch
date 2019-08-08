@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch;
+package com.pharbers.connect.elasticsearch;
 
 public class ElasticsearchSinkConnectorConstants {
   public static final String MAP_KEY = "key";

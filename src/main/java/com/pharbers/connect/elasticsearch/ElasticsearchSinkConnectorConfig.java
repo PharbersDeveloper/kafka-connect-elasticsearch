@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package io.confluent.connect.elasticsearch;
+package com.pharbers.connect.elasticsearch;
 
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
@@ -24,14 +24,16 @@ import org.apache.kafka.common.config.ConfigDef.Width;
 import java.util.List;
 import java.util.Map;
 
-import static io.confluent.connect.elasticsearch.DataConverter.BehaviorOnNullValues;
-import static io.confluent.connect.elasticsearch.bulk.BulkProcessor.BehaviorOnMalformedDoc;
+import static com.pharbers.connect.elasticsearch.DataConverter.BehaviorOnNullValues;
+import static com.pharbers.connect.elasticsearch.bulk.BulkProcessor.BehaviorOnMalformedDoc;
 import static org.apache.kafka.common.config.SslConfigs.addClientSslSupport;
 
 public class ElasticsearchSinkConnectorConfig extends AbstractConfig {
   private static final String SSL_GROUP = "Security";
 
   public static final String JOB_ID_CONFIG = "jobId";
+  public static final String RECALL_SKIP_CONFIG = "recall.skip";
+  private static final String RECALL_SKIP_DOC = "Skip recall option(yes or no). The default is no.";
 
   public static final String CONNECTION_URL_CONFIG = "connection.url";
   private static final String CONNECTION_URL_DOC =
@@ -193,6 +195,16 @@ public class ElasticsearchSinkConnectorConfig extends AbstractConfig {
             Type.STRING,
             Importance.HIGH,
             "Single job id."
+    ).define(
+            RECALL_SKIP_CONFIG,
+            Type.STRING,
+            "no",
+            Importance.LOW,
+            RECALL_SKIP_DOC,
+            group,
+            ++order,
+            Width.LONG,
+            "Skip recall option(yes or no)."
     ).define(
         CONNECTION_USERNAME_CONFIG,
         Type.STRING,
