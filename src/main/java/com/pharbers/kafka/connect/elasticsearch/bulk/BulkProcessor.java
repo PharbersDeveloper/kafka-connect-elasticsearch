@@ -13,10 +13,10 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch.bulk;
+package com.pharbers.kafka.connect.elasticsearch.bulk;
 
-import com.pharbers.connect.elasticsearch.ElasticsearchSinkConnectorConfig;
-import com.pharbers.connect.elasticsearch.RetryUtil;
+import com.pharbers.kafka.connect.elasticsearch.ElasticsearchSinkConnectorConfig;
+import com.pharbers.kafka.connect.elasticsearch.RetryUtil;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.connect.errors.ConnectException;

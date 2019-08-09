@@ -13,12 +13,12 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch;
+package com.pharbers.kafka.connect.elasticsearch;
 
 import com.pharbers.kafka.producer.PharbersKafkaProducer;
 import com.pharbers.kafka.schema.SinkRecall;
-import com.pharbers.connect.elasticsearch.bulk.BulkProcessor;
-import com.pharbers.connect.elasticsearch.jest.JestElasticsearchClient;
+import com.pharbers.kafka.connect.elasticsearch.bulk.BulkProcessor;
+import com.pharbers.kafka.connect.elasticsearch.jest.JestElasticsearchClient;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigException;

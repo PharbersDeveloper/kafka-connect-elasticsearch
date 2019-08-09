@@ -13,9 +13,9 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch;
+package com.pharbers.kafka.connect.elasticsearch;
 
-import com.pharbers.connect.elasticsearch.bulk.BulkProcessor;
+import com.pharbers.kafka.connect.elasticsearch.bulk.BulkProcessor;
 import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.sink.SinkRecord;

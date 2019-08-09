@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch;
+package com.pharbers.kafka.connect.elasticsearch;
 
 import java.util.Objects;
 

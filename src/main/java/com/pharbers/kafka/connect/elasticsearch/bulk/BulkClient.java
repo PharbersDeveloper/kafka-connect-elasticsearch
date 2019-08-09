@@ -13,19 +13,15 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch.bulk;
+package com.pharbers.kafka.connect.elasticsearch.bulk;
 
-
-import com.pharbers.connect.elasticsearch.ElasticsearchClient;
-
+import java.io.IOException;
 import java.util.List;
 
-/**
- * BulkRequest is a marker interface for use with
- * {@link ElasticsearchClient#createBulkRequest(List)} and
- * {@link ElasticsearchClient#executeBulk(BulkRequest)}.
- * Implementations will typically hold state comprised of instances of classes that are
- * specific to the client library.
- */
-public interface BulkRequest {
+public interface BulkClient<R, B> {
+
+  B bulkRequest(List<R> batch);
+
+  BulkResponse execute(B req) throws IOException;
+
 }

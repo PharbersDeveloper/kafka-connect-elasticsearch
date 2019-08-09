@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch.bulk;
+package com.pharbers.kafka.connect.elasticsearch.bulk;
 
 public class BulkResponse {
 

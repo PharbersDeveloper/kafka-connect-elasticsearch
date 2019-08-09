@@ -13,20 +13,19 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch.jest;
+package com.pharbers.kafka.connect.elasticsearch.jest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.JsonObject;
-import com.pharbers.connect.elasticsearch.ElasticsearchClient;
-import com.pharbers.connect.elasticsearch.ElasticsearchSinkConnectorConfig;
-import com.pharbers.connect.elasticsearch.Key;
-import com.pharbers.connect.elasticsearch.IndexableRecord;
-import com.pharbers.connect.elasticsearch.Mapping;
-import com.pharbers.connect.elasticsearch.bulk.BulkRequest;
-import com.pharbers.connect.elasticsearch.bulk.BulkResponse;
+import com.pharbers.kafka.connect.elasticsearch.ElasticsearchClient;
+import com.pharbers.kafka.connect.elasticsearch.ElasticsearchSinkConnectorConfig;
+import com.pharbers.kafka.connect.elasticsearch.Key;
+import com.pharbers.kafka.connect.elasticsearch.IndexableRecord;
+import com.pharbers.kafka.connect.elasticsearch.Mapping;
+import com.pharbers.kafka.connect.elasticsearch.bulk.BulkRequest;
+import com.pharbers.kafka.connect.elasticsearch.bulk.BulkResponse;
 import io.searchbox.action.Action;
 import io.searchbox.action.BulkableAction;
 import io.searchbox.client.JestClient;
@@ -42,8 +41,6 @@ import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.IndicesExists;
-import io.searchbox.indices.aliases.AddAliasMapping;
-import io.searchbox.indices.aliases.ModifyAliases;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
 import org.apache.http.HttpHost;
@@ -271,14 +268,21 @@ public class JestElasticsearchClient implements ElasticsearchClient {
 
   public void createIndices(Set<String> indices) {
     for (String index : indices) {
-      //TODO：phIndexPostfix is required?
-      //TODO：alias is required?
-      String phIndexPostfix = "-000001";
-      String phIndex = index + phIndexPostfix;
-      String alias = index;
-      if (!indexExists(phIndex) || !indexExists(index)) {
+      if (!indexExists(index)) {
+        //TODO：phIndexPostfix is required?
+        //TODO：alias is required?
+        String phIndexPostfix = "-000001";
+        String phIndex = index + phIndexPostfix;
+        String alias = index;
+        String settingsJson = "{\n" +
+                "   \"aliases\": {\n" +
+                "       \""+ alias +"\": {\n" +
+                "           \"is_write_index\": true\n" +
+                "       }" +
+                "   }" +
+                "}";
         try {
-          CreateIndex createIndex = new CreateIndex.Builder(phIndex).build();
+          CreateIndex createIndex = new CreateIndex.Builder(phIndex).settings(settingsJson).build();
           JestResult result = client.execute(createIndex);
           if (!result.isSucceeded()) {
             // Check if phIndex was created by another client
@@ -288,14 +292,6 @@ public class JestElasticsearchClient implements ElasticsearchClient {
             }
           }
           indexCache.add(phIndex);
-          ModifyAliases modifyAliases = new ModifyAliases.Builder(
-                  new AddAliasMapping.Builder(phIndex, alias).build()
-          ).build();
-          JestResult aliasResult = client.execute(modifyAliases);
-          if (!aliasResult.isSucceeded()) {
-            String msg = aliasResult.getErrorMessage() != null ? ": " + aliasResult.getErrorMessage() : "";
-            throw new ConnectException("Could not create alias '" + alias + "'" + msg);
-          }
         } catch (IOException e) {
           throw new ConnectException(e);
         }

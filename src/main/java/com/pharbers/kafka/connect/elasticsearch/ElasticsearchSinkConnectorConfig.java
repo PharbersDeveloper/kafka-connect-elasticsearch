@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch;
+package com.pharbers.kafka.connect.elasticsearch;
 
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
@@ -24,8 +24,8 @@ import org.apache.kafka.common.config.ConfigDef.Width;
 import java.util.List;
 import java.util.Map;
 
-import static com.pharbers.connect.elasticsearch.DataConverter.BehaviorOnNullValues;
-import static com.pharbers.connect.elasticsearch.bulk.BulkProcessor.BehaviorOnMalformedDoc;
+import static com.pharbers.kafka.connect.elasticsearch.DataConverter.BehaviorOnNullValues;
+import static com.pharbers.kafka.connect.elasticsearch.bulk.BulkProcessor.BehaviorOnMalformedDoc;
 import static org.apache.kafka.common.config.SslConfigs.addClientSslSupport;
 
 public class ElasticsearchSinkConnectorConfig extends AbstractConfig {

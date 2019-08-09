@@ -13,9 +13,9 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.pharbers.connect.elasticsearch.jest;
+package com.pharbers.kafka.connect.elasticsearch.jest;
 
-import com.pharbers.connect.elasticsearch.bulk.BulkRequest;
+import com.pharbers.kafka.connect.elasticsearch.bulk.BulkRequest;
 import io.searchbox.core.Bulk;
 
 public class JestBulkRequest implements BulkRequest {
